@@ -18,7 +18,9 @@
 ARG HADOOP_VERSION=3.1.0
 ARG HUDI_VERSION=0.14.1
 ARG SPARK_VERSION=3.4
-FROM apachehudi/hudi-hadoop_${HADOOP_VERSION}-base:latest
+ARG HUB_USER=satheeshsmart
+ARG HUB_USER=satheeshsmart
+FROM ${HUB_USER}}/hudi-hadoop_${HADOOP_VERSION}-base-java11:latest
 
 ENV HIVE_HOME /opt/hive
 ENV PATH $HIVE_HOME/bin:$PATH

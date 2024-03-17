@@ -23,20 +23,25 @@ ENV LANG C.UTF-8
 
 ARG HADOOP_VERSION=3.1.0
 ARG HADOOP_URL=https://archive.apache.org/dist/hadoop/common/hadoop-${HADOOP_VERSION}/hadoop-${HADOOP_VERSION}.tar.gz
+ARG HADOOP_URL_2=https://drive.usercontent.google.com/download?id=1ShfmllwwajzEYMRSQnFXijE4PI5e-yFP&export=download&authuser=3&confirm=t&uuid=59d938ea-4622-4902-b7b5-7e98aaae53d3&at=APZUnTUhtmWkJo_lGBjv167oi4eA%3A1710605410757
 ENV HADOOP_VERSION ${HADOOP_VERSION}
 ENV HADOOP_URL ${HADOOP_URL}
 
-RUN set -x \
-    && DEBIAN_FRONTEND=noninteractive apt-get -yq update && apt-get -yq install curl wget netcat procps \
-    && echo "Fetch URL2 is : ${HADOOP_URL}" \
-    && curl -fSL "${HADOOP_URL}" -o /tmp/hadoop.tar.gz \
+# ADD hadoop.tar.gz /tmp/hadoop.tar.gz
+# RUN set -x && ls -lrt /tmp
+RUN set -x && DEBIAN_FRONTEND=noninteractive apt-get -yq update && apt-get -yq install curl wget netcat procps
+
+RUN set -x  echo "Fetch URL2 is : ${HADOOP_URL}" \
+    && curl -fSL "${HADOOP_URL_2}" -o /tmp/hadoop.tar.gz \
     && curl -fSL "${HADOOP_URL}.asc" -o /tmp/hadoop.tar.gz.asc \
     && mkdir -p /opt/hadoop-$HADOOP_VERSION/logs \
     && tar -xvf /tmp/hadoop.tar.gz -C /opt/ \
-    && rm /tmp/hadoop.tar.gz* \
-    && ln -s /opt/hadoop-$HADOOP_VERSION/etc/hadoop /etc/hadoop \
-    && cp /etc/hadoop/mapred-site.xml.template /etc/hadoop/mapred-site.xml \
-    && mkdir /hadoop-data
+    && rm /tmp/hadoop.tar.gz*
+
+RUN set -x ln -s /opt/hadoop-$HADOOP_VERSION/etc/hadoop /etc/hadoop 
+    #&& cp /etc/hadoop/mapred-site.xml.template /etc/hadoop/mapred-site.xml
+
+RUN mkdir /hadoop-data
 
 ENV HADOOP_PREFIX=/opt/hadoop-$HADOOP_VERSION
 ENV HADOOP_CONF_DIR=/etc/hadoop

@@ -20,7 +20,8 @@
 
 ARG HADOOP_VERSION=3.1.0
 ARG TRINO_VERSION=368
-FROM apachehudi/hudi-hadoop_${HADOOP_VERSION}-trinobase_${TRINO_VERSION}:latest as trino-base
+ARG HUB_USER=satheeshsmart
+FROM ${HUB_USER}}/hudi-hadoop_${HADOOP_VERSION}-trinobase_${TRINO_VERSION}:latest as trino-base
 
 ADD etc /usr/local/trino/etc
 EXPOSE 8092

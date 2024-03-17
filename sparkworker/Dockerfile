@@ -18,7 +18,8 @@
 ARG HADOOP_VERSION=3.1.0
 ARG HIVE_VERSION=3.1.2
 ARG SPARK_VERSION=3.4.0
-FROM apachehudi/hudi-hadoop_${HADOOP_VERSION}-hive_${HIVE_VERSION}-sparkbase_${SPARK_VERSION}
+ARG HUB_USER=satheeshsmart
+FROM ${HUB_USER}}/hudi-hadoop_${HADOOP_VERSION}-hive_${HIVE_VERSION}-sparkbase_${SPARK_VERSION}:latest
 
 COPY worker.sh /opt/spark
 

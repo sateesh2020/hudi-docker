@@ -21,7 +21,9 @@
 ARG HADOOP_VERSION=3.1.0
 ARG HUDI_VERSION=0.14.1
 ARG HIVE_VERSION=3.1.2
-FROM apachehudi/hudi-hadoop_${HADOOP_VERSION}-base:latest as hadoop-base
+ARG HUB_USER=satheeshsmart
+ARG HUB_USER=satheeshsmart
+FROM ${HUB_USER}}/hudi-hadoop_${HADOOP_VERSION}-base-java11:latest as hadoop-base
 
 ARG PRESTO_VERSION=0.271
 

@@ -17,8 +17,9 @@
 
 ARG HADOOP_VERSION=3.1.0
 ARG HADOOP_VER_SHORT=3
-ARG HIVE_VERSION=2.3.3
-FROM apachehudi/hudi-hadoop_${HADOOP_VERSION}-hive_${HIVE_VERSION}
+ARG HIVE_VERSION=3.1.2
+ARG HUB_USER=satheeshsmart
+FROM ${HUB_USER}}/hudi-hadoop_${HADOOP_VERSION}-hive_${HIVE_VERSION}:latest
 
 ENV ENABLE_INIT_DAEMON true
 ENV INIT_DAEMON_BASE_URI http://identifier/init-daemon

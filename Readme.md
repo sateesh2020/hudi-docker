@@ -6,6 +6,16 @@ Source: https://github.com/apache/hudi/tree/master/docker/hoodie/hadoop
 
 
 
+Base Images
+
+hudi-hadoop_${HADOOP_VERSION}-base
+hudi-hadoop_${HADOOP_VERSION}-base-java-11
+hudi-hadoop_${HADOOP_VERSION}-hive_${HIVE_VERSION}
+hudi-hadoop_${HADOOP_VERSION}-hive_${HIVE_VERSION}-sparkbase_${SPARK_VERSION}
+hudi-hadoop_${HADOOP_VERSION}-trinobase_${TRINO_VERSION}
+
+
+
 Changes Needed:
 
 hive_base/conf/

@@ -17,7 +17,10 @@
 
 ARG HADOOP_VERSION=3.1.0
 ARG HADOOP_DN_PORT=50075
-FROM apachehudi/hudi-hadoop_${HADOOP_VERSION}-base:latest
+ARG HUB_USER=satheeshsmart
+ARG HUB_USER=satheeshsmart
+#FROM 404d0d04e564
+FROM --platform=linux/amd64 ${HUB_USER}/hudi-hadoop_${HADOOP_VERSION}-base-java11:latest
 
 ENV HADOOP_DN_PORT ${HADOOP_DN_PORT}
 

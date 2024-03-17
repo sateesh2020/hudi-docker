@@ -16,7 +16,6 @@
 # limitations under the License.
 
 FROM openjdk:8u212-jdk-slim-stretch
-MAINTAINER Hoodie
 USER root
 
 # Default to UTF-8 file.encoding
