@@ -19,7 +19,7 @@ ARG HADOOP_VERSION=3.3.6
 ARG HADOOP_VER_SHORT=3
 ARG HIVE_VERSION=3.1.2
 ARG HUB_USER=satheeshsmart
-FROM ${HUB_USER}/hudi-hadoop_${HADOOP_VERSION}-hive_${HIVE_VERSION}:latest
+FROM ${HUB_USER}/hudi-hadoop-hive-base:latest
 
 ENV ENABLE_INIT_DAEMON true
 ENV INIT_DAEMON_BASE_URI http://identifier/init-daemon
@@ -34,10 +34,10 @@ COPY execute-step.sh /
 COPY finish-step.sh /
 
 RUN echo "Installing Spark-version (${SPARK_VERSION})" \
-      &&  wget https://archive.apache.org/dist/spark/spark-${SPARK_VERSION}/spark-${SPARK_VERSION}-bin-hadoop${HADOOP_VER_SHORT}.tgz \
-      && tar -xvzf spark-${SPARK_VERSION}-bin-hadoop${HADOOP_VER_SHORT}.tgz \
-      && mv spark-${SPARK_VERSION}-bin-hadoop${HADOOP_VER_SHORT} /opt/spark \
-      && rm spark-${SPARK_VERSION}-bin-hadoop${HADOOP_VER_SHORT}.tgz \
+      &&  wget https://archive.apache.org/dist/spark/spark-${SPARK_VERSION}/spark-${SPARK_VERSION}-bin-hadoop3.tgz \
+      && tar -xvzf spark-${SPARK_VERSION}-bin-hadoop3.tgz \
+      && mv spark-${SPARK_VERSION}-bin-hadoop3 /opt/spark \
+      && rm spark-${SPARK_VERSION}-bin-hadoop3.tgz \
       && cd /
 
 # # Install python3 to enable and use pyspark shell

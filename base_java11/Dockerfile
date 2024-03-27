@@ -134,3 +134,5 @@ ADD entrypoint.sh /entrypoint.sh
 RUN chmod a+x /entrypoint.sh
 ADD export_container_ip.sh /usr/bin/
 RUN chmod a+x /usr/bin/export_container_ip.sh
+
+ENTRYPOINT ["/bin/bash", "/entrypoint.sh"]

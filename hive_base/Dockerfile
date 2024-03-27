@@ -18,7 +18,7 @@
 ARG HADOOP_VERSION=3.3.6
 ARG HUDI_VERSION=0.14.1
 ARG SPARK_VERSION=3.4
-FROM hudi-hadoop_${HADOOP_VERSION}-base-java11:latest
+FROM hudi-hadoop-base:latest
 
 ENV HIVE_HOME /opt/hive
 ENV PATH $HIVE_HOME/bin:$PATH
@@ -53,12 +53,19 @@ ADD conf/llap-daemon-log4j2.properties $HIVE_HOME/conf
 # Setup Hoodie Library jars
 RUN mkdir -p jars
 
-RUN echo "Downloading Hudi jars"\
-	&& wget -O /opt/jars/hudi-hadoop-mr-bundle.jar "https://repo1.maven.org/maven2/org/apache/hudi/hudi-hadoop-mr-bundle/${HUDI_VERSION}/hudi-hadoop-mr-bundle-${HUDI_VERSION}.jar" \
-	&& wget -O /opt/jars/hudi-hive-sync-bundle.jar "https://repo1.maven.org/maven2/org/apache/hudi/hudi-hive-sync-bundle/${HUDI_VERSION}/hudi-hive-sync-bundle-${HUDI_VERSION}.jar" \
-	&& wget -O /opt/jars/hudi-spark-bundle.jar "https://repo1.maven.org/maven2/org/apache/hudi/hudi-spark${SPARK_VERSION}-bundle_2.12/${HUDI_VERSION}/hudi-spark${SPARK_VERSION}-bundle_2.12-${HUDI_VERSION}.jar" \
-	&& wget -O /opt/jars/hudi-utilities.jar "https://repo1.maven.org/maven2/org/apache/hudi/hudi-utilities/${HUDI_VERSION}/hudi-utilities-${HUDI_VERSION}.jar" \
-	&& wget -O /opt/jars/hudi-integ-test-bundle.jar "https://repo1.maven.org/maven2/org/apache/hudi/hudi-integ-test-bundle/${HUDI_VERSION}/hudi-integ-test-bundle-${HUDI_VERSION}.jar"
+
+ARG HUDI_MR_URL=https://repo1.maven.org/maven2/org/apache/hudi/hudi-hadoop-mr-bundle/0.14.1/hudi-hadoop-mr-bundle-0.14.1.jar
+ARG HUDI_SYNC_URL=https://repo1.maven.org/maven2/org/apache/hudi/hudi-hive-sync-bundle/0.14.1/hudi-hive-sync-bundle-0.14.1.jar
+ARG HUDI_SPARK_URL=https://repo1.maven.org/maven2/org/apache/hudi/hudi-spark3.4-bundle_2.12/0.14.1/hudi-spark3.4-bundle_2.12-0.14.1.jar
+ARG HUDI_UTIL_URL=https://repo1.maven.org/maven2/org/apache/hudi/hudi-utilities_2.12/0.14.1/hudi-utilities_2.12-0.14.1.jar
+ARG HUDI_INTEG_URL=https://repo1.maven.org/maven2/org/apache/hudi/hudi-integ-test-bundle/0.14.1/hudi-integ-test-bundle-0.14.1.jar
+
+
+RUN echo "Downloading Hudi Hadoop MR Bundle jar" && wget -O /opt/jars/hudi-hadoop-mr-bundle.jar ${HUDI_MR_URL}
+RUN echo "Downloading Hudi Hive Sync Bundle jar" && wget -O /opt/jars/hudi-hive-sync-bundle.jar ${HUDI_SYNC_URL}
+RUN echo "Downloading Hudi Spark Bundle jar" && wget -O /opt/jars/hudi-spark-bundle.jar ${HUDI_SPARK_URL} 
+RUN echo "Downloading Hudi Utilities Bundle jar" && wget -O /opt/jars/hudi-utilities.jar ${HUDI_UTIL_URL} 
+RUN echo "Downloading Hudi Integ Test Bundle jar" && wget -O /opt/jars/hudi-integ-test-bundle.jar ${HUDI_INTEG_URL}
 
 
 ENV HUDI_HADOOP_BUNDLE=/opt/jars/hoodie-hadoop-mr-bundle.jar

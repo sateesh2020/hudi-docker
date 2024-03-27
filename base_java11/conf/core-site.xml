@@ -17,11 +17,11 @@
 <!-- Put site-specific property overrides in this file. -->
 
 <configuration>
-        <!-- <property>
+        <property>
                 <name>fs.defaultFS</name>
-                <value>hdfs://spaelapv04.nw1.nwestnetwork.com:8020</value>
+                <value>hdfs://spaelapv06.nw1.nwestnetwork.com:8020</value>
                 <description>Where HDFS NameNode can be found on the network</description>
-        </property> -->
+        </property>
 
         <property>
                 <name>hadoop.http.staticuser.user</name>
