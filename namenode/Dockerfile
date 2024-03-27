@@ -15,11 +15,10 @@
 #  See the License for the specific language governing permissions and
 # limitations under the License.
 
-ARG HADOOP_VERSION=3.1.0 
+ARG HADOOP_VERSION=3.3.6 
 ARG HADOOP_WEBHDFS_PORT=50070
 ARG HUB_USER=satheeshsmart
-ARG HUB_USER=satheeshsmart
-FROM ${HUB_USER}}/hudi-hadoop_${HADOOP_VERSION}-base-java11:latest
+FROM ${HUB_USER}/hudi-hadoop_${HADOOP_VERSION}-base-java11:latest
 
 ENV HADOOP_WEBHDFS_PORT ${HADOOP_WEBHDFS_PORT}
 

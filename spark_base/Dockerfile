@@ -15,21 +15,19 @@
 #  See the License for the specific language governing permissions and
 # limitations under the License.
 
-ARG HADOOP_VERSION=3.1.0
+ARG HADOOP_VERSION=3.3.6
 ARG HADOOP_VER_SHORT=3
 ARG HIVE_VERSION=3.1.2
 ARG HUB_USER=satheeshsmart
-FROM ${HUB_USER}}/hudi-hadoop_${HADOOP_VERSION}-hive_${HIVE_VERSION}:latest
+FROM ${HUB_USER}/hudi-hadoop_${HADOOP_VERSION}-hive_${HIVE_VERSION}:latest
 
 ENV ENABLE_INIT_DAEMON true
 ENV INIT_DAEMON_BASE_URI http://identifier/init-daemon
 ENV INIT_DAEMON_STEP spark_master_init
 
 ARG SPARK_VERSION=3.4.0
-ARG SPARK_HADOOP_VERSION=2.7
 
 ENV SPARK_VERSION ${SPARK_VERSION}
-ENV HADOOP_VERSION ${SPARK_HADOOP_VERSION}
 
 COPY wait-for-step.sh /
 COPY execute-step.sh /
@@ -42,14 +40,16 @@ RUN echo "Installing Spark-version (${SPARK_VERSION})" \
       && rm spark-${SPARK_VERSION}-bin-hadoop${HADOOP_VER_SHORT}.tgz \
       && cd /
 
-# Install python3 to enable and use pyspark shell
-RUN apt-get update \
-    && apt-get -yq install python3 \
-    && ln -sf $(which python3) /usr/bin/python \
-    && rm -rf /var/lib/apt/lists/*
+# # Install python3 to enable and use pyspark shell
+# RUN apt-get update \
+#     && apt-get -yq install python3 \
+#     && ln -sf $(which python3) /usr/bin/python \
+#     && rm -rf /var/lib/apt/lists/*
 
 #Give permission to execute scripts
 RUN chmod +x /wait-for-step.sh && chmod +x /execute-step.sh && chmod +x /finish-step.sh
+
+
 
 # Fix the value of PYTHONHASHSEED
 # Note: this is needed when you use Python 3.3 or greater
@@ -63,6 +63,18 @@ ENV PATH $SPARK_INSTALL/bin:$PATH
 ENV SPARK_DRIVER_PORT 5001
 ENV SPARK_UI_PORT 5002
 ENV SPARK_BLOCKMGR_PORT 5003
+
+ADD conf/core-site.xml $SPARK_HOME/conf
+ADD conf/yarn-site.xml $SPARK_HOME/conf
+
+
+RUN pip install --default-timeout=100 --upgrade pip
+RUN pip install pikepdf Cython numpy wheel setuptools --force-reinstall
+
+ADD requirements.txt /requirements.txt
+
+# run install
+RUN pip install -r /requirements.txt
 
 EXPOSE $SPARK_DRIVER_PORT $SPARK_UI_PORT $SPARK_BLOCKMGR_PORT
 

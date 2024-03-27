@@ -15,11 +15,10 @@
 #  See the License for the specific language governing permissions and
 # limitations under the License.
 
-ARG HADOOP_VERSION=3.1.0
+ARG HADOOP_VERSION=3.3.6
 ARG HADOOP_HISTORY_PORT=8188
 ARG HUB_USER=satheeshsmart
-ARG HUB_USER=satheeshsmart
-FROM ${HUB_USER}}/hudi-hadoop_${HADOOP_VERSION}-base-java11:latest
+FROM ${HUB_USER}/hudi-hadoop_${HADOOP_VERSION}-base-java11:latest
 
 ENV HADOOP_HISTORY_PORT ${HADOOP_HISTORY_PORT}
 

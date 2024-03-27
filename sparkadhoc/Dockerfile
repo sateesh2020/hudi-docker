@@ -15,11 +15,11 @@
 #  See the License for the specific language governing permissions and
 # limitations under the License.
 
-ARG HADOOP_VERSION=3.1.0 
+ARG HADOOP_VERSION=3.3.6 
 ARG HIVE_VERSION=3.1.2
 ARG SPARK_VERSION=3.4.0
 ARG HUB_USER=satheeshsmart
-FROM ${HUB_USER}}/hudi-hadoop_${HADOOP_VERSION}-hive_${HIVE_VERSION}-sparkbase_${SPARK_VERSION}:latest
+FROM ${HUB_USER}/hudi-hadoop_${HADOOP_VERSION}-hive_${HIVE_VERSION}-sparkbase_${SPARK_VERSION}:latest
 
 ARG PRESTO_VERSION=0.268
 ARG TRINO_VERSION=368

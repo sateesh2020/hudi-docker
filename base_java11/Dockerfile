@@ -1,64 +1,136 @@
+FROM openjdk:11-jdk AS jdk
 
-#  Licensed to the Apache Software Foundation (ASF) under one
-#  or more contributor license agreements.  See the NOTICE file
-#  distributed with this work for additional information
-#  regarding copyright ownership.  The ASF licenses this file
-#  to you under the Apache License, Version 2.0 (the
-#  "License"); you may not use this file except in compliance
-#  with the License.  You may obtain a copy of the License at
-#
-#      http://www.apache.org/licenses/LICENSE-2.0
-#
-#  Unless required by applicable law or agreed to in writing, software
-#  distributed under the License is distributed on an "AS IS" BASIS,
-#  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-#  See the License for the specific language governing permissions and
-# limitations under the License.
+FROM python:3.11
 
-FROM openjdk:11-jdk-slim-bullseye
 USER root
 
-# Default to UTF-8 file.encoding
-ENV LANG C.UTF-8
+# --------------------------------------------------------
+# JAVA
+# --------------------------------------------------------
+RUN apt update
+RUN apt-get install -y --no-install-recommends \
+    python3-launchpadlib \
+    software-properties-common
+# RUN add-apt-repository ppa:openjdk-r/ppa
+# RUN apt update
+# RUN apt install -y --no-install-recommends \
+#     openjdk-8-jdk
+# For AMD based architecture use
+# ENV JAVA_HOME=/usr/lib/jvm/java-11-openjdk-amd64/
+COPY --from=jdk /usr/local/openjdk-11 /usr/lib/jvm/java-11-openjdk-arm64/
+ENV JAVA_HOME=/usr/lib/jvm/java-11-openjdk-arm64/
+# For AMD based architecture use
+# ENV JAVA_HOME=/usr/lib/jvm/java-11-openjdk-amd64/
 
-ARG HADOOP_VERSION=3.1.0
-ARG HADOOP_URL=https://archive.apache.org/dist/hadoop/common/hadoop-${HADOOP_VERSION}/hadoop-${HADOOP_VERSION}.tar.gz
-ARG HADOOP_URL_2=https://drive.usercontent.google.com/download?id=1ShfmllwwajzEYMRSQnFXijE4PI5e-yFP&export=download&authuser=3&confirm=t&uuid=59d938ea-4622-4902-b7b5-7e98aaae53d3&at=APZUnTUhtmWkJo_lGBjv167oi4eA%3A1710605410757
-ENV HADOOP_VERSION ${HADOOP_VERSION}
-ENV HADOOP_URL ${HADOOP_URL}
-
-# ADD hadoop.tar.gz /tmp/hadoop.tar.gz
-# RUN set -x && ls -lrt /tmp
-RUN set -x && DEBIAN_FRONTEND=noninteractive apt-get -yq update && apt-get -yq install curl wget netcat procps
-
-RUN set -x  echo "Fetch URL2 is : ${HADOOP_URL}" \
-    && curl -fSL "${HADOOP_URL_2}" -o /tmp/hadoop.tar.gz \
-    && curl -fSL "${HADOOP_URL}.asc" -o /tmp/hadoop.tar.gz.asc \
-    && mkdir -p /opt/hadoop-$HADOOP_VERSION/logs \
-    && tar -xvf /tmp/hadoop.tar.gz -C /opt/ \
-    && rm /tmp/hadoop.tar.gz*
-
-RUN set -x ln -s /opt/hadoop-$HADOOP_VERSION/etc/hadoop /etc/hadoop 
-    #&& cp /etc/hadoop/mapred-site.xml.template /etc/hadoop/mapred-site.xml
-
-RUN mkdir /hadoop-data
-
+# --------------------------------------------------------
+# HADOOP
+# --------------------------------------------------------
+ENV HADOOP_VERSION=3.3.6
+ENV HADOOP_URL=https://downloads.apache.org/hadoop/common/hadoop-$HADOOP_VERSION/hadoop-$HADOOP_VERSION.tar.gz
 ENV HADOOP_PREFIX=/opt/hadoop-$HADOOP_VERSION
 ENV HADOOP_CONF_DIR=/etc/hadoop
 ENV MULTIHOMED_NETWORK=1
-ENV HADOOP_HOME=${HADOOP_PREFIX}
-ENV HADOOP_INSTALL=${HADOOP_HOME}
 ENV USER=root
-ENV PATH /usr/bin:/bin:$HADOOP_PREFIX/bin/:$PATH
+ENV HADOOP_HOME=/opt/hadoop-$HADOOP_VERSION
+ENV PATH $HADOOP_PREFIX/bin/:$PATH
+ENV PATH $HADOOP_HOME/bin/:$PATH
+
+# COPY hadoop.tar.gz /tmp/
+# RUN tar -xvf /tmp/hadoop.tar.gz -C /opt/
+# RUN rm /tmp/hadoop.tar.gz*
+
+RUN set -x \
+    && curl -fSL "$HADOOP_URL" -o /tmp/hadoop.tar.gz \
+    && tar -xvf /tmp/hadoop.tar.gz -C /opt/ \
+    && rm /tmp/hadoop.tar.gz*
+
+RUN ln -s /opt/hadoop-$HADOOP_VERSION/etc/hadoop /etc/hadoop
+RUN mkdir /opt/hadoop-$HADOOP_VERSION/logs
+RUN mkdir /hadoop-data
+
+USER root
+
+COPY conf/core-site.xml $HADOOP_CONF_DIR/core-site.xml
+COPY conf/hdfs-site.xml $HADOOP_CONF_DIR/hdfs-site.xml
+COPY conf/mapred-site.xml $HADOOP_CONF_DIR/mapred-site.xml
+COPY conf/yarn-site.xml $HADOOP_CONF_DIR/yarn-site.xml
+
+# ADD hadoop.env /hadoop.env
+
+# RUN set -x && cd / && ./entrypoint.sh
+
+# --------------------------------------------------------
+# SPARK
+# --------------------------------------------------------
+
+# ENV SPARK_VERSION spark-3.4.2
+# ENV SPARK_URL https://downloads.apache.org/spark/${SPARK_VERSION}/${SPARK_VERSION}-bin-hadoop3.tgz
+# ENV SPARK_HOME=/opt/$SPARK_VERSION
+# ENV PATH $SPARK_HOME/bin:$PATH
+# # ENV HADOOP_CONF_DIR=$SPARK_HOME/conf
+# ENV PYSPARK_PYTHON=python3
+# ENV PYTHONHASHSEED=1
+
+# # COPY spark.tgz /tmp/
+# # RUN tar -xvzf /tmp/spark.tgz -C /opt/ 
+# # RUN rm /tmp/spark.tgz 
+# # RUN mv /opt/${SPARK_VERSION}-bin-hadoop3 /opt/${SPARK_VERSION}
+
+# RUN set -x \
+#     && curl -fSL "${SPARK_URL}" -o /tmp/spark.tar.gz \
+#     && tar -xvzf /tmp/spark.tar.gz -C /opt/ \
+#     && rm /tmp/spark.tar.gz* \
+#     && mv /opt/${SPARK_VERSION}-bin-hadoop3 /opt/${SPARK_VERSION}
+
+# ADD conf/core-site.xml $SPARK_HOME/conf
+# ADD conf/yarn-site.xml $SPARK_HOME/conf
+
+#=========
+# INSTALL PYTHON DEPS
+#=========
+RUN apt-get update && add-apt-repository ppa:deadsnakes/ppa \
+    && apt-get install -y --no-install-recommends \
+    gcc \
+    g++ \
+    subversion \
+    python3-dev \
+    gfortran \
+    build-essential \
+    libopenblas-dev \
+    liblapack-dev \
+    libqpdf-dev \
+    pkg-config \
+    libzbar-dev \
+    python3-dev \
+    libpython3-dev \
+    qpdf \
+    xvfb \
+    gconf-service \
+    libasound2 \
+    libatk1.0-0 \
+    libcairo2 \
+    libcups2 \
+    libfontconfig1 \
+    libgdk-pixbuf2.0-0 \
+    libgtk-3-0 \
+    libnspr4 \
+    libpango-1.0-0 \
+    libxss1 \
+    fonts-liberation \
+    libappindicator1 \
+    libnss3 \
+    lsb-release \
+    xdg-utils \
+    wget \
+    && apt-get autoremove -yqq --purge \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/*
 
 # Exposing a union of ports across hadoop versions
 # Well known ports including ssh
-EXPOSE 0-1024 4040 7000-10100 5000-5100 50000-50200 58188 58088 58042 
+EXPOSE 0-1024 4040 7000-10100 5000-5100 50000-50200 58188 58088 58042
 
 ADD entrypoint.sh /entrypoint.sh
+RUN chmod a+x /entrypoint.sh
 ADD export_container_ip.sh /usr/bin/
-RUN chmod a+x /usr/bin/export_container_ip.sh \
-    && chmod a+x /entrypoint.sh
-
-ENTRYPOINT ["/bin/bash", "/entrypoint.sh"]
-
+RUN chmod a+x /usr/bin/export_container_ip.sh

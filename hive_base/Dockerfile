@@ -15,12 +15,10 @@
 #  See the License for the specific language governing permissions and
 # limitations under the License.
 
-ARG HADOOP_VERSION=3.1.0
+ARG HADOOP_VERSION=3.3.6
 ARG HUDI_VERSION=0.14.1
 ARG SPARK_VERSION=3.4
-ARG HUB_USER=satheeshsmart
-ARG HUB_USER=satheeshsmart
-FROM ${HUB_USER}}/hudi-hadoop_${HADOOP_VERSION}-base-java11:latest
+FROM hudi-hadoop_${HADOOP_VERSION}-base-java11:latest
 
 ENV HIVE_HOME /opt/hive
 ENV PATH $HIVE_HOME/bin:$PATH

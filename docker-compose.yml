@@ -18,7 +18,7 @@ version: "3.3"
 services:
 
   namenode:
-    image: ${HUB_USER}/hudi-hadoop_${HADOOP_VERSION}-namenode:latest
+    image: hudi-hadoop_${HADOOP_VERSION}-namenode:latest
     hostname: namenode
     container_name: namenode
     environment:
@@ -37,7 +37,7 @@ services:
       retries: 3
 
   datanode1:
-    image: ${HUB_USER}/hudi-hadoop_${HADOOP_VERSION}-datanode:latest
+    image: hudi-hadoop_${HADOOP_VERSION}-datanode:latest
     container_name: datanode1
     hostname: datanode1
     environment:
@@ -61,7 +61,7 @@ services:
       - namenode
 
   historyserver:
-    image: ${HUB_USER}/hudi-hadoop_${HADOOP_VERSION}-historyserver:latest
+    image: hudi-hadoop_${HADOOP_VERSION}-historyserver:latest
     hostname: historyserver
     container_name: historyserver
     environment:
@@ -81,7 +81,36 @@ services:
       - ./hadoop.env
     volumes:
       - historyserver:/hadoop/yarn/timeline
+  
+  resourcemanager:
+    image: hudi-hadoop_${HADOOP_VERSION}-resourcemanager:latest
+    hostname: resourcemanager
+    container_name: resourcemanager
+    restart: on-failure
+    env_file:
+      - ./hadoop.env
+    ports:
+      - 50088:8088
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://resourcemanager:8088"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
 
+  nodemanager:
+    image: hudi-hadoop_${HADOOP_VERSION}-nodemanager:latest
+    hostname: nodemanager
+    container_name: nodemanager
+    env_file:
+      - ./hadoop.env
+    ports:
+      - 50042:8042
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://nodemanager:8042"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+  
   hive-metastore-postgresql:
     image: bde2020/hive-metastore-postgresql:2.3.0
     volumes:
@@ -90,7 +119,7 @@ services:
     container_name: hive-metastore-postgresql
 
   hivemetastore:
-    image: ${HUB_USER}/hudi-hadoop_${HADOOP_VERSION}-hive_${HIVE_VERSION}:latest
+    image: hudi-hadoop_${HADOOP_VERSION}-hive_${HIVE_VERSION}:latest
     hostname: hivemetastore
     container_name: hivemetastore
     links:
